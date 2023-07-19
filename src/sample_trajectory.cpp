@@ -1,7 +1,4 @@
-#include "joint_trajectory_controller/trajectory.hpp"
-#include "trajectory_msgs/msg/joint_trajectory.hpp"
-#include "trajectory_msgs/msg/joint_trajectory_point.hpp"
-#include "joint_trajectory_controller/interpolation_methods.hpp"
+#include "test_jtc_trajectories/sample_trajectory.hpp"
 
 using TrajectoryPointIter = std::vector<trajectory_msgs::msg::JointTrajectoryPoint>::iterator;
 using TrajectoryPointConstIter =
@@ -12,96 +9,77 @@ int main(int argc, char ** argv)
   (void) argc;
   (void) argv;  
 
-  joint_trajectory_controller::interpolation_methods::InterpolationMethod interpolation_method_{
-    joint_trajectory_controller::interpolation_methods::InterpolationMethod::VARIABLE_DEGREE_SPLINE};
-  TrajectoryPointConstIter start_segment_itr, end_segment_itr;
-  joint_trajectory_controller::Trajectory traj_;
-  trajectory_msgs::msg::JointTrajectoryPoint state_sampled_;
-  state_sampled_.positions.resize(1, 0.0);
-  state_sampled_.velocities.resize(1, 0.0);
-  state_sampled_.accelerations.resize(1, 0.0);
-
   // set initial point
-  trajectory_msgs::msg::JointTrajectoryPoint state_desired_;
-  state_desired_.positions.resize(1, 0.0);
-  state_desired_.velocities.resize(1, 0.0);
-  state_desired_.accelerations.resize(1, 0.0);
-  traj_.set_point_before_trajectory_msg(rclcpp::Time(0), state_desired_);
-  std::cout << "Initial point " << std::endl;
-  std::cout << "Position: " << state_desired_.positions.at(0) << std::endl;
-  std::cout << "Velocity: " << state_desired_.velocities.at(0) << std::endl;
-  std::cout << "Accleration: " << state_desired_.accelerations.at(0) << std::endl;
+  double pos = 0.0;
+  double vel = 0.0;
+  double acc = 0.0;
 
-  // set path
-  trajectory_msgs::msg::JointTrajectory msg;
-  trajectory_msgs::msg::JointTrajectoryPoint point;
-  double dt = 0.5;
-  point.positions.resize(1);
-  point.velocities.resize(1);
-  point.accelerations.resize(1);
-  const auto delay = std::chrono::milliseconds(500);
-  rclcpp::Duration duration_total{rclcpp::Duration(delay)};
+  // #################
+  {
+    double dt = 0.5;
+    SampleTrajectory trajectory_sampler(pos,vel,acc,0);
 
-  point.time_from_start = duration_total;
-  point.accelerations.at(0) = 1.0;
-  msg.points.push_back(point);
-  duration_total += rclcpp::Duration(delay);
-
-  point.time_from_start = duration_total;
-  point.accelerations.at(0) = 0.5;
-  msg.points.push_back(point);
-  duration_total += rclcpp::Duration(delay);
-
-  point.time_from_start = duration_total;
-  point.accelerations.at(0) = -1.0;
-  msg.points.push_back(point);
-  duration_total += rclcpp::Duration(delay);
-
-  point.time_from_start = duration_total;
-  point.accelerations.at(0) = -0.5;
-  msg.points.push_back(point);
-  duration_total += rclcpp::Duration(delay);
-
-  point.time_from_start = duration_total;
-  point.accelerations.at(0) = 0.;
-  msg.points.push_back(point);
-  duration_total += rclcpp::Duration(delay);
-
-  std::cout << std::endl << "Trajectory " << std::endl;
-  size_t i = 0;
-  msg.points.at(i).velocities.at(0) = state_desired_.velocities.at(0) + msg.points.at(i).accelerations.at(0) * dt;
-  msg.points.at(i).positions.at(0) = state_desired_.positions.at(0) + msg.points.at(i).velocities.at(0) * dt;
-  std::cout << "time: " << msg.points.at(i).time_from_start.sec + static_cast<double>(msg.points.at(i).time_from_start.nanosec)/1.e9 << std::endl;
-  std::cout << "Position: " << msg.points.at(i).positions.at(0) << std::endl;
-  std::cout << "Velocity: " << msg.points.at(i).velocities.at(0) << std::endl;
-  std::cout << "Accleration: " << msg.points.at(i).accelerations.at(0) << std::endl;
-  for (size_t i = 1; i < msg.points.size(); i++) {
-    msg.points.at(i).velocities.at(0) = msg.points.at(i-1).velocities.at(0) + msg.points.at(i).accelerations.at(0) * dt;
-    msg.points.at(i).positions.at(0) = msg.points.at(i-1).positions.at(0) + msg.points.at(i).velocities.at(0) * dt;
-    std::cout << "time: " << msg.points.at(i).time_from_start.sec + static_cast<double>(msg.points.at(i).time_from_start.nanosec)/1.e9 << std::endl;
-    std::cout << "Position: " << msg.points.at(i).positions.at(0) << std::endl;
-    std::cout << "Velocity: " << msg.points.at(i).velocities.at(0) << std::endl;
-    std::cout << "Accleration: " << msg.points.at(i).accelerations.at(0) << std::endl;
+    std::cout << std::endl << "Create Trajectory " << std::endl;
+    std::vector<double> positions; positions.resize(5);
+    std::vector<double> velocities; velocities.resize(5);
+    std::vector<double> accelerations = {1.0, 0.5, -1.0, -0.5, 0.0};  
+    size_t i = 0;
+    velocities.at(i) = vel + accelerations.at(i) * dt;
+    positions.at(i) = pos + velocities.at(i) * dt;
+    std::cout << "time: " << dt*(i+1) << std::endl;
+    std::cout << "Position: " << positions.at(i) << std::endl;
+    std::cout << "Velocity: " << velocities.at(i) << std::endl;
+    std::cout << "Accleration: " << accelerations.at(i) << std::endl;
+    for (size_t i = 1; i < accelerations.size(); i++) {
+      velocities.at(i) = velocities.at(i-1) + accelerations.at(i) * dt;
+      positions.at(i) = positions.at(i-1) + velocities.at(i) * dt;
+      std::cout << "time: " << dt*(i+1) << std::endl;
+      std::cout << "Position: " << positions.at(i) << std::endl;
+      std::cout << "Velocity: " << velocities.at(i) << std::endl;
+      std::cout << "Accleration: " << accelerations.at(i) << std::endl;
+    }
+    
+    trajectory_sampler.add_trajectory(dt, positions, velocities, accelerations);
+    trajectory_sampler.sample(0.1);
   }
-  traj_.update(std::make_shared<trajectory_msgs::msg::JointTrajectory>(msg));
 
-  std::cout << "# points: " << msg.points.size() << std::endl;
+  // #################
+  {
+    double dt = 0.5;
+    SampleTrajectory trajectory_sampler(pos,vel,acc,0);
 
+    std::cout << std::endl << "Create Trajectory " << std::endl;
+    std::vector<double> positions; positions.resize(5);
+    std::vector<double> velocities = {1.0, 0.5, -1.0, -0.5, 0.0}; 
+    std::vector<double> accelerations; 
+    size_t i = 0;
+    positions.at(i) = pos + velocities.at(i) * dt;
+    std::cout << "time: " << dt*(i+1) << std::endl;
+    std::cout << "Position: " << positions.at(i) << std::endl;
+    std::cout << "Velocity: " << velocities.at(i) << std::endl;
+    for (size_t i = 1; i < velocities.size(); i++) {
+      positions.at(i) = positions.at(i-1) + velocities.at(i) * dt;
+      std::cout << "time: " << dt*(i+1) << std::endl;
+      std::cout << "Position: " << positions.at(i) << std::endl;
+      std::cout << "Velocity: " << velocities.at(i) << std::endl;
+    }
+    
+    trajectory_sampler.add_trajectory(dt, positions, velocities, accelerations);
+    trajectory_sampler.sample(0.1);
+  }
+  
+  // #################
+  {
+    double dt = 0.5;
+    SampleTrajectory trajectory_sampler(pos,vel,acc,0);
 
-  std::cout << std::endl << "Start sampling" << std::endl;
-  double interval_s = 0.1;
-  for (int i = 0; i < duration_total.seconds()/interval_s; i++){
-    rclcpp::Time time = rclcpp::Time(i*interval_s*1e9);
-
-    const bool valid_point =
-      traj_.sample(time, interpolation_method_, state_sampled_, start_segment_itr, end_segment_itr);
-
-    std::cout << "time: " << time.seconds() << std::endl;
-    std::cout << "valid_point: " << valid_point << std::endl;
-    std::cout << "Position: " << state_sampled_.positions.at(0) << std::endl;
-    std::cout << "Velocity: " << state_sampled_.velocities.at(0) << std::endl;
-    std::cout << "Accleration: " << state_sampled_.accelerations.at(0) << std::endl;
-    std::cout << std::endl;
+    std::cout << std::endl << "Create Trajectory " << std::endl;
+    std::vector<double> positions = {1.0, 0.5, -1.0, -0.5, 0.0};
+    std::vector<double> velocities; 
+    std::vector<double> accelerations;  
+    
+    trajectory_sampler.add_trajectory(dt, positions, velocities, accelerations);
+    trajectory_sampler.sample(0.1);
   }
 
   return 0;
