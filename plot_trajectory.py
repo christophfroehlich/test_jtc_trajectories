@@ -1,16 +1,12 @@
 import sys
 import os
-sys.path.append(os.path.join(
-    os.path.dirname(__file__),
-    "../../install/control_toolbox/lib/"))
+
 sys.path.append(os.path.join(
     os.path.dirname(__file__),
     "../../install/test_jtc_trajectories/lib/test_jtc_trajectories/"))
 
 from TestJtc import SampleTrajectory
 import matplotlib.pyplot as plt
-import matplotlib as mpl
-import matplotlib.colors as mcolors
 import numpy as np
 
 show_figure = False
