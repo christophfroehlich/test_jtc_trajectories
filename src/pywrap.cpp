@@ -14,7 +14,9 @@ PYBIND11_MODULE(TestJtc, m) {
     .def(py::init<double, double, double, int>())  
     .def("add_trajectory", &SampleTrajectory::add_trajectory, py::call_guard<py::gil_scoped_release>())
     .def("sample", &SampleTrajectory::sample, py::call_guard<py::gil_scoped_release>())
-    // .def_readonly("v_data", &MyClass::v_data, byref)
-    // .def_readonly("v_gamma", &MyClass::v_gamma, byref)
+    .def_readonly("time_sampled", &SampleTrajectory::time_sampled_, byref)
+    .def_readonly("positions_sampled", &SampleTrajectory::positions_sampled_, byref)
+    .def_readonly("accelerations_sampled", &SampleTrajectory::accelerations_sampled_, byref)
+    .def_readonly("velocities_sampled", &SampleTrajectory::velocities_sampled_, byref)
     ;
 }
