@@ -55,7 +55,7 @@ public:
 
     trajectory_msgs::msg::JointTrajectory msg;
     trajectory_msgs::msg::JointTrajectoryPoint point;
-    size_t num_points;
+    size_t num_points = 0;
     if (has_position_) {
       num_points = positions.size();
       point.positions.resize(1);
