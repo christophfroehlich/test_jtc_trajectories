@@ -38,9 +38,9 @@ if True:
     trajectory_sampler_spline.add_trajectory(dt, positions, velocities, accelerations)
     trajectory_sampler_spline.sample(dt_sample)
 
-    plt.figure(figsize=(7.0, 3.0))  # default 100dpi -> 700px
+    plt.figure().set_figwidth(7.0)  # default 100dpi -> 700px
+    plt.subplot(2, 1, 1)
     plt.plot(0.0, pos0, style_init, label="Initial point")
-    plt.plot(time, positions, style_points, label="Trajectory points")
     plt.step(
         trajectory_sampler.time_sampled,
         trajectory_sampler.positions_sampled,
@@ -54,10 +54,20 @@ if True:
         where="post",
         label="Sampled points `spline`",
     )
-    plt.xlabel("time / s")
     plt.ylabel("position")
     plt.grid()
     plt.legend(bbox_to_anchor=(1.05, 1.0), loc="upper left")
+    plt.subplot(2, 1, 2)
+    plt.plot(0.0, vel0, style_init, label="Initial point")
+    plt.step(
+        trajectory_sampler_spline.time_sampled,
+        trajectory_sampler_spline.velocities_sampled,
+        where="post",
+        label="Sampled points `spline`",
+    )
+    plt.ylabel("velocity")
+    plt.xlabel("time / s")
+    plt.grid()
     plt.tight_layout()
     plt.savefig("spline_position.png")
     if show_figure:
@@ -81,7 +91,7 @@ if True:
     trajectory_sampler_spline.sample(dt_sample)
 
     plt.figure().set_figwidth(7.0)  # default 100dpi -> 700px
-    plt.subplot(2, 1, 1)
+    plt.subplot(3, 1, 1)
     plt.plot(0.0, pos0, style_init, label="Initial point")
     plt.step(
         trajectory_sampler_spline.time_sampled,
@@ -91,7 +101,8 @@ if True:
     )
     plt.ylabel("position")
     plt.grid()
-    plt.subplot(2, 1, 2)
+
+    plt.subplot(3, 1, 2)
     plt.plot(0.0, vel0, style_init, label="Initial point")
     plt.plot(time, velocities, style_points, label="Trajectory points")
     plt.step(
@@ -101,9 +112,21 @@ if True:
         label="Sampled points `spline`",
     )
     plt.ylabel("velocity")
-    plt.xlabel("time / s")
     plt.grid()
     plt.legend(bbox_to_anchor=(1.05, 1.0), loc="upper left")
+    plt.tight_layout()
+
+    plt.subplot(3, 1, 3)
+    plt.plot(0.0, acc0, style_init, label="Initial point")
+    plt.step(
+        trajectory_sampler_spline.time_sampled,
+        trajectory_sampler_spline.accelerations_sampled,
+        where="post",
+        label="Sampled points `spline`",
+    )
+    plt.xlabel("time / s")
+    plt.ylabel("acceleration")
+    plt.grid()
     plt.tight_layout()
     plt.savefig("spline_velocity.png")
     if show_figure:
@@ -139,7 +162,7 @@ if True:
     trajectory_sampler.sample(dt_sample)
 
     plt.figure().set_figwidth(7.0)  # default 100dpi -> 700px
-    plt.subplot(2, 1, 1)
+    plt.subplot(3, 1, 1)
     plt.plot(0.0, pos0, style_init, label="Initial point")
     plt.plot(time, positions, style_points, label="Trajectory points")
     plt.plot(
@@ -156,7 +179,7 @@ if True:
     )
     plt.ylabel("position")
     plt.grid()
-    plt.subplot(2, 1, 2)
+    plt.subplot(3, 1, 2)
     plt.plot(0.0, vel0, style_init, label="Initial point")
     plt.plot(time, velocities, style_points, label="Trajectory points")
     plt.plot(
@@ -176,6 +199,20 @@ if True:
     plt.grid()
     plt.legend(bbox_to_anchor=(1.05, 1.0), loc="upper left")
     plt.tight_layout()
+
+    plt.subplot(3, 1, 3)
+    plt.plot(0.0, acc0, style_init, label="Initial point")
+    plt.step(
+        trajectory_sampler_spline.time_sampled,
+        trajectory_sampler_spline.accelerations_sampled,
+        where="post",
+        label="Sampled points `spline`",
+    )
+    plt.xlabel("time / s")
+    plt.ylabel("acceleration")
+    plt.grid()
+    plt.tight_layout()
+
     plt.savefig("spline_position_velocity.png")
     if show_figure:
         plt.show()

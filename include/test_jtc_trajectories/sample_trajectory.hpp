@@ -7,6 +7,7 @@ using TrajectoryPointIter = std::vector<trajectory_msgs::msg::JointTrajectoryPoi
 using TrajectoryPointConstIter =
   std::vector<trajectory_msgs::msg::JointTrajectoryPoint>::const_iterator;
 
+using joint_trajectory_controller::interpolation_methods::InterpolationMethod;
 class SampleTrajectory
 {
 public:
@@ -27,13 +28,11 @@ public:
     switch (interpolation_method)
     {
       case 1:
-        interpolation_method_ = joint_trajectory_controller::interpolation_methods::
-          InterpolationMethod::VARIABLE_DEGREE_SPLINE;
+        interpolation_method_ = InterpolationMethod::VARIABLE_DEGREE_SPLINE;
         std::cout << "Spline" << std::endl;
         break;
       default:
-        interpolation_method_ =
-          joint_trajectory_controller::interpolation_methods::InterpolationMethod::NONE;
+        interpolation_method_ = InterpolationMethod::NONE;
         std::cout << "None" << std::endl;
     }
   }
@@ -63,15 +62,18 @@ public:
     trajectory_msgs::msg::JointTrajectory msg;
     trajectory_msgs::msg::JointTrajectoryPoint point;
     size_t num_points = 0;
-    if (has_position_) {
+    if (has_position_)
+    {
       num_points = positions.size();
       point.positions.resize(1);
     }
-    if (has_velocity_) {
+    if (has_velocity_)
+    {
       num_points = velocities.size();
       point.velocities.resize(1);
     }
-    if (has_acceleration_) {
+    if (has_acceleration_)
+    {
       num_points = accelerations.size();
       point.accelerations.resize(1);
     }
@@ -79,13 +81,16 @@ public:
     {
       duration_total_ += rclcpp::Duration(delay);
       point.time_from_start = duration_total_;
-      if (has_position_) {
+      if (has_position_)
+      {
         point.positions.at(0) = positions.at(i);
       }
-      if (has_velocity_) {
+      if (has_velocity_)
+      {
         point.velocities.at(0) = velocities.at(i);
       }
-      if (has_acceleration_) {
+      if (has_acceleration_)
+      {
         point.accelerations.at(0) = accelerations.at(i);
       }
       msg.points.push_back(point);
@@ -122,12 +127,16 @@ public:
         std::cout << "Position: " << state_sampled.positions.at(0) << std::endl;
         positions_sampled_.push_back(state_sampled.positions.at(0));
       }
-      if (has_velocity_ || (has_acceleration_ && !has_position_))
+      if (
+        has_velocity_ || (interpolation_method_ == InterpolationMethod::VARIABLE_DEGREE_SPLINE &&
+                          (has_position_ || (has_acceleration_ && !has_position_))))
       {
         std::cout << "Velocity: " << state_sampled.velocities.at(0) << std::endl;
         velocities_sampled_.push_back(state_sampled.velocities.at(0));
       }
-      if (has_acceleration_)
+      if (
+        has_acceleration_ ||
+        (has_velocity_ && interpolation_method_ == InterpolationMethod::VARIABLE_DEGREE_SPLINE))
       {
         std::cout << "Acceleration: " << state_sampled.accelerations.at(0) << std::endl;
         accelerations_sampled_.push_back(state_sampled.accelerations.at(0));
