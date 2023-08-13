@@ -56,7 +56,7 @@ int main(int argc, char ** argv)
       std::cout << "Acceleration: " << accelerations.at(i) << std::endl;
     }
 
-    trajectory_sampler.add_trajectory(dt, positions, velocities, accelerations);
+    trajectory_sampler.add_trajectory(dt, dt, positions, velocities, accelerations);
     trajectory_sampler.sample(0.1);
   }
 
@@ -83,7 +83,7 @@ int main(int argc, char ** argv)
       std::cout << "Velocity: " << velocities.at(i) << std::endl;
     }
 
-    trajectory_sampler.add_trajectory(dt, positions, velocities, accelerations);
+    trajectory_sampler.add_trajectory(dt, dt, positions, velocities, accelerations);
     trajectory_sampler.sample(0.1);
   }
 
@@ -97,7 +97,7 @@ int main(int argc, char ** argv)
     std::vector<double> velocities;
     std::vector<double> accelerations;
 
-    trajectory_sampler.add_trajectory(dt, positions, velocities, accelerations);
+    trajectory_sampler.add_trajectory(dt, dt, positions, velocities, accelerations);
     trajectory_sampler.sample(0.1);
   }
 

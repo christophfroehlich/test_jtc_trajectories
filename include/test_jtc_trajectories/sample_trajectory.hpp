@@ -58,11 +58,11 @@ public:
   }
 
   void add_trajectory(
-    double dt, std::vector<double> positions, std::vector<double> velocities,
+    double dt, double T0, std::vector<double> positions, std::vector<double> velocities,
     std::vector<double> accelerations)
   {
     const auto delay = std::chrono::milliseconds(static_cast<int>(dt * 1000));
-    duration_total_ = rclcpp::Duration(0, 0);
+    duration_total_ = rclcpp::Duration::from_seconds(T0);
 
     has_position_ = positions.size() > 0;
     has_velocity_ = velocities.size() > 0;
@@ -99,7 +99,10 @@ public:
     }
     for (size_t i = 0; i < num_points; i++)
     {
-      duration_total_ += rclcpp::Duration(delay);
+      if (i > 0)
+      {
+        duration_total_ += rclcpp::Duration(delay);
+      }
       point.time_from_start = duration_total_;
       if (has_position_)
       {
